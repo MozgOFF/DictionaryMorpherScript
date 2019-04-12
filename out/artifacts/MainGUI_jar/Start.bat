@@ -1,0 +1,1 @@
+java -Duser.language=ru -Duser.country=RU -Dfile.encoding=UTF-8 -jar DictionaryScript.jar
