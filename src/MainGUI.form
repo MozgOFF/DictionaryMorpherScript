@@ -40,7 +40,7 @@
                 </constraints>
                 <properties/>
               </component>
-              <component id="45c96" class="javax.swing.JTextField" binding="tokenTextField" default-binding="true">
+              <component id="45c96" class="javax.swing.JTextField" binding="token_static_text">
                 <constraints>
                   <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
                     <preferred-size width="150" height="-1"/>
@@ -52,7 +52,7 @@
                   <text value="token"/>
                 </properties>
               </component>
-              <component id="d7074" class="javax.swing.JTextField" default-binding="true">
+              <component id="d7074" class="javax.swing.JTextField" binding="value_static_text">
                 <constraints>
                   <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
                     <preferred-size width="150" height="-1"/>

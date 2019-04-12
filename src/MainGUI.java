@@ -1,4 +1,3 @@
-import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
@@ -22,12 +21,13 @@ public class MainGUI extends JDialog {
     private JButton addToDictionaryButton;
     private JTextPane textPane1;
     private JTextField textField_token;
-    private JTextField tokenTextField;
+    private JTextField token_static_text;
     private JTextPane textPane2;
     private JComboBox comboBox1;
     private JButton remainderButton;
     private JTextField textField_value;
     private JButton clearValuesButton;
+    private JTextField value_static_text;
     private StyledDocument console;
     private StyledDocument main_panel;
     private StringBuilder stringBuilderOutput = new StringBuilder();
@@ -135,8 +135,14 @@ public class MainGUI extends JDialog {
             private void clearData() {
                 try {
                     stringSet.clear();
+                    stringBuilderOutput.setLength(0);
+                    textPane1.setText("");
+                    textField_token.setText(null);
+                    textField_value.setText(null);
+                    consoleLog(console.getLength(), "\nДанные очищены!", successKey);
                 } catch (NullPointerException e) {
                     consoleLog(console.getLength(), "\nНе смог очистить данные: " + e.getMessage(), errorKey);
+                    e.getMessage();
                 }
             }
         });
@@ -144,18 +150,18 @@ public class MainGUI extends JDialog {
 
 
     private void onAddToDictionaryClicked() {
-        used_token = comboBox1.getSelectedIndex() == 0 ? TOKEN_1 :
-                comboBox1.getSelectedIndex() == 1 ? TOKEN_2 : TOKEN_3;
+        getUserToken();
 
         value_field_text = textField_value.getText().toLowerCase();
         text_to_produce = textField_token.getText().toLowerCase();
+
 
         if (stringSet != null) {
             stringSet.clear();
         }
 
         try {
-            String JSONstr = readJSON(used_token, text_to_produce);
+            String JSONstr = readJSON(text_to_produce, "declension");
             parseJSON(JSONstr);
 
             stringSet = new TreeSet<>(JSONOutputArray);
@@ -174,12 +180,19 @@ public class MainGUI extends JDialog {
             consoleLog(console.getLength(), "\nПоздравляю, ты сломал консоль", successKey);
             e.getMessage();
         }
+        textField_token.setText(null);
+        textField_value.setText(null);
+    }
 
+    private String getUserToken() {
+        return (comboBox1.getSelectedIndex() == 0) ? TOKEN_1 :
+               (comboBox1.getSelectedIndex() == 1) ? TOKEN_2 : TOKEN_3;
     }
 
     private void parseJSON(String json) {
         JSONParser parser = new JSONParser();
         JSONOutputArray.clear();
+
         try {
             Object obj = parser.parse(json);
             JSONObject jsonObject = (JSONObject) obj;
@@ -199,34 +212,44 @@ public class MainGUI extends JDialog {
             JSONOutputArray.add(Declension_3);
             JSONOutputArray.add(Declension_4);
             JSONOutputArray.add(Declension_5);
-            //            ArrayList arr = (ArrayList) parser.get("idArr"); // Получаем массив
-            JSONObject plural = (JSONObject) jsonObject.get("множественное"); // Получаем сложную JSON структуру
-//            double objX = (double) coordsArr.get("x"); // Берем координаты из этой структуры
-//            double objY = (double) coordsArr.get("y"); // Явное приведение к нужному примитивному типу
-            String Declension_plural_1 = (String) plural.get("Р");
-            String Declension_plural_2 = (String) plural.get("Д");
-            String Declension_plural_3 = (String) plural.get("В");
-            String Declension_plural_4 = (String) plural.get("Т");
-            String Declension_plural_5 = (String) plural.get("П");
-            System.out.println(Declension_plural_1);
-            System.out.println(Declension_plural_2);
-            System.out.println(Declension_plural_3);
-            System.out.println(Declension_plural_4);
-            System.out.println(Declension_plural_5);
-            JSONOutputArray.add(Declension_plural_1);
-            JSONOutputArray.add(Declension_plural_2);
-            JSONOutputArray.add(Declension_plural_3);
-            JSONOutputArray.add(Declension_plural_4);
-            JSONOutputArray.add(Declension_plural_5);
+//            ArrayList arr = (ArrayList) parser.get("idArr"); // Получаем массив
+            if ((JSONObject) jsonObject.get("множественное") != null) {
+                JSONObject plural = (JSONObject) jsonObject.get("множественное"); // Получаем сложную JSON структуру
+
+                String Declension_plural_1 = (String) plural.get("Р");
+                String Declension_plural_2 = (String) plural.get("Д");
+                String Declension_plural_3 = (String) plural.get("В");
+                String Declension_plural_4 = (String) plural.get("Т");
+                String Declension_plural_5 = (String) plural.get("П");
+
+                System.out.println(Declension_plural_1);
+                System.out.println(Declension_plural_2);
+                System.out.println(Declension_plural_3);
+                System.out.println(Declension_plural_4);
+                System.out.println(Declension_plural_5);
+
+                JSONOutputArray.add(Declension_plural_1);
+                JSONOutputArray.add(Declension_plural_2);
+                JSONOutputArray.add(Declension_plural_3);
+                JSONOutputArray.add(Declension_plural_4);
+                JSONOutputArray.add(Declension_plural_5);
+            }
+
         } catch (ParseException e) {
+            consoleLog(console.getLength(), "\nУпс, злое зло!", errorKey);
             e.printStackTrace();
         }
     }
 
-    private String readJSON(String user_token, String str) throws IOException {
+    private String readJSON(String str, String request) throws IOException {
         BufferedReader reader = null;
         try {
-            URL url = new URL(BASE_URL +  "russian/declension?format=json&s=" + str + "&token=" + user_token);
+            URL url;
+            url = request.equals("declension") ?
+                    new URL(BASE_URL + "russian/declension?format=json&s=" + str + "&token=" + getUserToken()) :
+                    request.equals("remainder") ?
+                            new URL(BASE_URL + "get_queries_left_for_today?format=json&token=" + getUserToken()) :
+                            null;
             reader = new BufferedReader(new InputStreamReader(url.openStream()));
             StringBuffer buffer = new StringBuffer();
             int read;
@@ -262,8 +285,18 @@ public class MainGUI extends JDialog {
     }
 
     private void requestRemainder() {
-
-        consoleLog(console.getLength(), "\nОстаток запросов на сегодня: ", null);
+        try {
+            String remainder = readJSON(text_to_produce, "remainder");
+            try {
+                consoleLog(console.getLength(), "\nОстаток запросов на сегодня: " + Integer.parseInt(remainder), null);
+            } catch (NumberFormatException e) {
+                consoleLog(console.getLength(), "\nКажется неверный токен!", errorKey);
+                e.printStackTrace();
+            }
+        } catch (IOException e) {
+            consoleLog(console.getLength(), "\nНе получилось спарсить json по остатку!", errorKey);
+            e.printStackTrace();
+        }
     }
 
     private void consoleLog(int offset, String str, AttributeSet a) {
