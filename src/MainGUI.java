@@ -60,7 +60,6 @@ public class MainGUI extends JDialog {
         comboBox2.addItem(LANG_KK);
         comboBox2.addItem(LANG_UK);
 
-
         console = textPane2.getStyledDocument();
         main_panel = textPane1.getStyledDocument();
 
@@ -417,8 +416,8 @@ public class MainGUI extends JDialog {
 //                return true;
 //            }
 //        }
-//        return !(input == null) && input.matches("^[А-Яа-я]+$");
-        return true;
+        return !(input == null) && input.matches("^[а-яәғқңөұүһіґєії]+$");
+//        return true;
     }
 
     private void onCancel() {
