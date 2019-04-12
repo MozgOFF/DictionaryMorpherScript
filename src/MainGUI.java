@@ -15,6 +15,9 @@ public class MainGUI extends JDialog {
     private static final String TOKEN_2 = "0914316b-fafb-4c86-a29b-791c639da5b2";   //мой второй
     private static final String TOKEN_3 = "a7dab5fe-7a47-4c17-84ea-46facb7d19fe";   //неверный
     private static final String BASE_URL = "https://ws3.morpher.ru/";
+    private static final String LANG_RU = "russian";   //борщ
+    private static final String LANG_KK = "qazaq";   //кумыс
+    private static final String LANG_UK = "ukrainian";   //сало
     private JPanel contentPane;
     private JButton buttonOK;
     private JButton buttonExport;
@@ -28,6 +31,7 @@ public class MainGUI extends JDialog {
     private JTextField textField_value;
     private JButton clearValuesButton;
     private JTextField value_static_text;
+    private JComboBox comboBox2;
     private StyledDocument console;
     private StyledDocument main_panel;
     private StringBuilder stringBuilderOutput = new StringBuilder();
@@ -51,6 +55,11 @@ public class MainGUI extends JDialog {
         comboBox1.addItem(TOKEN_1);
         comboBox1.addItem(TOKEN_2);
         comboBox1.addItem(TOKEN_3);
+
+        comboBox2.addItem(LANG_RU);
+        comboBox2.addItem(LANG_KK);
+        comboBox2.addItem(LANG_UK);
+
 
         console = textPane2.getStyledDocument();
         main_panel = textPane1.getStyledDocument();
@@ -193,51 +202,135 @@ public class MainGUI extends JDialog {
         JSONParser parser = new JSONParser();
         JSONOutputArray.clear();
 
-        try {
-            Object obj = parser.parse(json);
-            JSONObject jsonObject = (JSONObject) obj;
-            System.out.println(jsonObject);
-            String Declension_1 = (String) jsonObject.get("Р");
-            String Declension_2 = (String) jsonObject.get("Д");
-            String Declension_3 = (String) jsonObject.get("В");
-            String Declension_4 = (String) jsonObject.get("Т");
-            String Declension_5 = (String) jsonObject.get("П");
-            System.out.println(Declension_1);
-            System.out.println(Declension_2);
-            System.out.println(Declension_3);
-            System.out.println(Declension_4);
-            System.out.println(Declension_5);
-            JSONOutputArray.add(Declension_1);
-            JSONOutputArray.add(Declension_2);
-            JSONOutputArray.add(Declension_3);
-            JSONOutputArray.add(Declension_4);
-            JSONOutputArray.add(Declension_5);
+        if (getLanguage().equals("russian")) {
+            try {
+                Object obj = parser.parse(json);
+                JSONObject jsonObject = (JSONObject) obj;
+                System.out.println(jsonObject);
+                String Declension_1 = (String) jsonObject.get("Р");
+                String Declension_2 = (String) jsonObject.get("Д");
+                String Declension_3 = (String) jsonObject.get("В");
+                String Declension_4 = (String) jsonObject.get("Т");
+                String Declension_5 = (String) jsonObject.get("П");
+                System.out.println(Declension_1);
+                System.out.println(Declension_2);
+                System.out.println(Declension_3);
+                System.out.println(Declension_4);
+                System.out.println(Declension_5);
+                JSONOutputArray.add(Declension_1);
+                JSONOutputArray.add(Declension_2);
+                JSONOutputArray.add(Declension_3);
+                JSONOutputArray.add(Declension_4);
+                JSONOutputArray.add(Declension_5);
 //            ArrayList arr = (ArrayList) parser.get("idArr"); // Получаем массив
-            if ((JSONObject) jsonObject.get("множественное") != null) {
-                JSONObject plural = (JSONObject) jsonObject.get("множественное"); // Получаем сложную JSON структуру
+                if ((JSONObject) jsonObject.get("множественное") != null) {
+                    JSONObject plural = (JSONObject) jsonObject.get("множественное"); // Получаем сложную JSON структуру
 
-                String Declension_plural_1 = (String) plural.get("Р");
-                String Declension_plural_2 = (String) plural.get("Д");
-                String Declension_plural_3 = (String) plural.get("В");
-                String Declension_plural_4 = (String) plural.get("Т");
-                String Declension_plural_5 = (String) plural.get("П");
+                    String Declension_plural_1 = (String) plural.get("Р");
+                    String Declension_plural_2 = (String) plural.get("Д");
+                    String Declension_plural_3 = (String) plural.get("В");
+                    String Declension_plural_4 = (String) plural.get("Т");
+                    String Declension_plural_5 = (String) plural.get("П");
 
-                System.out.println(Declension_plural_1);
-                System.out.println(Declension_plural_2);
-                System.out.println(Declension_plural_3);
-                System.out.println(Declension_plural_4);
-                System.out.println(Declension_plural_5);
+                    System.out.println(Declension_plural_1);
+                    System.out.println(Declension_plural_2);
+                    System.out.println(Declension_plural_3);
+                    System.out.println(Declension_plural_4);
+                    System.out.println(Declension_plural_5);
 
-                JSONOutputArray.add(Declension_plural_1);
-                JSONOutputArray.add(Declension_plural_2);
-                JSONOutputArray.add(Declension_plural_3);
-                JSONOutputArray.add(Declension_plural_4);
-                JSONOutputArray.add(Declension_plural_5);
+                    JSONOutputArray.add(Declension_plural_1);
+                    JSONOutputArray.add(Declension_plural_2);
+                    JSONOutputArray.add(Declension_plural_3);
+                    JSONOutputArray.add(Declension_plural_4);
+                    JSONOutputArray.add(Declension_plural_5);
+                }
+
+            } catch (ParseException e) {
+                consoleLog(console.getLength(), "\nУпс, злое зло!", errorKey);
+                e.printStackTrace();
             }
+        } else if (getLanguage().equals("qazaq")) {
+            try {
+                Object obj = parser.parse(json);
+                JSONObject jsonObject = (JSONObject) obj;
+                System.out.println(jsonObject);
+                String Declension_1 = (String) jsonObject.get("І");
+                String Declension_2 = (String) jsonObject.get("Б");
+                String Declension_3 = (String) jsonObject.get("Т");
+                String Declension_4 = (String) jsonObject.get("Ш");
+                String Declension_5 = (String) jsonObject.get("Ж");
+                String Declension_6 = (String) jsonObject.get("К");
+                System.out.println(Declension_1);
+                System.out.println(Declension_2);
+                System.out.println(Declension_3);
+                System.out.println(Declension_4);
+                System.out.println(Declension_5);
+                System.out.println(Declension_6);
+                JSONOutputArray.add(Declension_1);
+                JSONOutputArray.add(Declension_2);
+                JSONOutputArray.add(Declension_3);
+                JSONOutputArray.add(Declension_4);
+                JSONOutputArray.add(Declension_5);
+                JSONOutputArray.add(Declension_6);
+                if ((JSONObject) jsonObject.get("көпше") != null) {
+                    JSONObject plural = (JSONObject) jsonObject.get("көпше");
 
-        } catch (ParseException e) {
-            consoleLog(console.getLength(), "\nУпс, злое зло!", errorKey);
-            e.printStackTrace();
+                    String Declension_plural_1 = (String) plural.get("A");
+                    String Declension_plural_2 = (String) plural.get("І");
+                    String Declension_plural_3 = (String) plural.get("Б");
+                    String Declension_plural_4 = (String) plural.get("Т");
+                    String Declension_plural_5 = (String) plural.get("Ш");
+                    String Declension_plural_6 = (String) plural.get("Ж");
+                    String Declension_plural_7 = (String) plural.get("К");
+
+                    System.out.println(Declension_plural_1);
+                    System.out.println(Declension_plural_2);
+                    System.out.println(Declension_plural_3);
+                    System.out.println(Declension_plural_4);
+                    System.out.println(Declension_plural_5);
+                    System.out.println(Declension_plural_6);
+                    System.out.println(Declension_plural_7);
+
+                    JSONOutputArray.add(Declension_plural_1);
+                    JSONOutputArray.add(Declension_plural_2);
+                    JSONOutputArray.add(Declension_plural_3);
+                    JSONOutputArray.add(Declension_plural_4);
+                    JSONOutputArray.add(Declension_plural_5);
+                    JSONOutputArray.add(Declension_plural_6);
+                    JSONOutputArray.add(Declension_plural_7);
+                }
+
+            } catch (ParseException e) {
+                consoleLog(console.getLength(), "\nУпс, злое зло!", errorKey);
+                e.printStackTrace();
+            }
+        } else if (getLanguage().equals("ukrainian")) {
+            try {
+                Object obj = parser.parse(json);
+                JSONObject jsonObject = (JSONObject) obj;
+                System.out.println(jsonObject);
+                String Declension_1 = (String) jsonObject.get("Р");
+                String Declension_2 = (String) jsonObject.get("Д");
+                String Declension_3 = (String) jsonObject.get("З");
+                String Declension_4 = (String) jsonObject.get("О");
+                String Declension_5 = (String) jsonObject.get("М");
+                String Declension_6 = (String) jsonObject.get("К");
+                System.out.println(Declension_1);
+                System.out.println(Declension_2);
+                System.out.println(Declension_3);
+                System.out.println(Declension_4);
+                System.out.println(Declension_5);
+                System.out.println(Declension_6);
+                JSONOutputArray.add(Declension_1);
+                JSONOutputArray.add(Declension_2);
+                JSONOutputArray.add(Declension_3);
+                JSONOutputArray.add(Declension_4);
+                JSONOutputArray.add(Declension_5);
+                JSONOutputArray.add(Declension_6);
+            } catch (ParseException e) {
+                consoleLog(console.getLength(), "\nУпс, злое зло!", errorKey);
+                e.printStackTrace();
+            }
         }
     }
 
@@ -246,7 +339,7 @@ public class MainGUI extends JDialog {
         try {
             URL url;
             url = request.equals("declension") ?
-                    new URL(BASE_URL + "russian/declension?format=json&s=" + str + "&token=" + getUserToken()) :
+                    new URL(BASE_URL + getLanguage() + "/declension?format=json&s=" + str + "&token=" + getUserToken()) :
                     request.equals("remainder") ?
                             new URL(BASE_URL + "get_queries_left_for_today?format=json&token=" + getUserToken()) :
                             null;
@@ -262,6 +355,11 @@ public class MainGUI extends JDialog {
             if (reader != null)
                 reader.close();
         }
+    }
+
+    private String getLanguage() {
+        return (comboBox2.getSelectedIndex() == 0) ? LANG_RU :
+                (comboBox2.getSelectedIndex() == 1) ? LANG_KK: LANG_UK;
     }
 
     private void exportCSV() {
@@ -319,7 +417,8 @@ public class MainGUI extends JDialog {
 //                return true;
 //            }
 //        }
-        return !(input == null) && input.matches("^[А-Яа-я]+$");
+//        return !(input == null) && input.matches("^[А-Яа-я]+$");
+        return true;
     }
 
     private void onCancel() {
