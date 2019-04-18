@@ -13,7 +13,12 @@ import java.util.*;
 public class MainGUI extends JDialog {
     private static final String TOKEN_1 = "ac5d61e2-fddb-44da-bf8d-2aceec0578af";   //мой
     private static final String TOKEN_2 = "0914316b-fafb-4c86-a29b-791c639da5b2";   //мой второй
-    private static final String TOKEN_3 = "a7dab5fe-7a47-4c17-84ea-46facb7d19fe";   //неверный
+    private static final String TOKEN_3 = "ba117244-42d8-4bcf-82f4-d8fb80a0e516";   //мой третий
+    private static final String TOKEN_4 = "f9dcf6ed-4455-449b-9e7d-e202d407eea4";   //мой четвертый
+    private static final String TOKEN_5 = "77701529-3a21-4603-9aec-d8c28d630dff";   //мой пятый
+    private static final String TOKEN_6 = "a7dab5fe-7a47-4c17-84ea-46facb7d19fe";   //неверный
+    private static final String TOKEN_7 = "4d753a2e-ad40-473f-a254-3107f83abcd7";   //неверный
+    private static final String TOKEN_8 = "179d415c-7116-4e54-91e8-6731fcf781de";   //неверный
     private static final String BASE_URL = "https://ws3.morpher.ru/";
     private static final String LANG_RU = "russian";   //борщ
     private static final String LANG_KK = "qazaq";   //кумыс
@@ -31,7 +36,10 @@ public class MainGUI extends JDialog {
     private JTextField textField_value;
     private JButton clearValuesButton;
     private JTextField value_static_text;
+    private JTextField textField1;
+    private JTextField textField2;
     private JComboBox comboBox2;
+    private JCheckBox additionalFieldCheckBox;
     private StyledDocument console;
     private StyledDocument main_panel;
     private StringBuilder stringBuilderOutput = new StringBuilder();
@@ -52,9 +60,17 @@ public class MainGUI extends JDialog {
         setModal(true);
         getRootPane().setDefaultButton(addToDictionaryButton);
 
+        textField1.setBackground(Color.lightGray);
+        textField2.setBackground(Color.lightGray);
+
         comboBox1.addItem(TOKEN_1);
         comboBox1.addItem(TOKEN_2);
         comboBox1.addItem(TOKEN_3);
+        comboBox1.addItem(TOKEN_4);
+        comboBox1.addItem(TOKEN_5);
+        comboBox1.addItem(TOKEN_6);
+        comboBox1.addItem(TOKEN_7);
+        comboBox1.addItem(TOKEN_8);
 
         comboBox2.addItem(LANG_RU);
         comboBox2.addItem(LANG_KK);
@@ -141,26 +157,52 @@ public class MainGUI extends JDialog {
             }
 
             private void clearData() {
+                textPane1.setText(null);
+                textField_token.setText(null);
+                textField_value.setText(null);
+                textField1.setText(null);
+                textField2.setText(null);
                 try {
                     stringSet.clear();
                     stringBuilderOutput.setLength(0);
-                    textPane1.setText("");
-                    textField_token.setText(null);
-                    textField_value.setText(null);
                     consoleLog(console.getLength(), "\nДанные очищены!", successKey);
                 } catch (NullPointerException e) {
-                    consoleLog(console.getLength(), "\nНе смог очистить данные: " + e.getMessage(), errorKey);
-                    e.getMessage();
+                    consoleLog(console.getLength(), "\nНе смог очистить переменные: " + e.getMessage(), errorKey);
+                    e.printStackTrace();
                 }
             }
         });
+        additionalFieldCheckBox.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                getAdditionalState();
+            }
+        });
+    }
+
+    private boolean getAdditionalState() {
+        if (additionalFieldCheckBox.isSelected()) {
+            textField1.setEnabled(true);
+            textField2.setEnabled(true);
+            textField1.setBackground(Color.white);
+            textField2.setBackground(Color.white);
+            return true;
+        } else {
+            textField1.setText(null);
+            textField2.setText(null);
+            textField1.setEnabled(false);
+            textField2.setEnabled(false);
+            textField1.setBackground(Color.lightGray);
+            textField2.setBackground(Color.lightGray);
+            return false;
+        }
     }
 
 
     private void onAddToDictionaryClicked() {
         getUserToken();
 
-        value_field_text = textField_value.getText().toLowerCase();
+        value_field_text = textField_value.getText();
         text_to_produce = textField_token.getText().toLowerCase();
 
 
@@ -173,8 +215,15 @@ public class MainGUI extends JDialog {
             parseJSON(JSONstr);
 
             stringSet = new TreeSet<>(JSONOutputArray);
-            for (Object aStringSet : stringSet) {
-                stringBuilderOutput.append(aStringSet).append(";").append(value_field_text).append("\n");
+            if (getAdditionalState()) {
+                for (Object aStringSet : stringSet) {
+                    stringBuilderOutput.append(aStringSet).append(";").append(value_field_text).append(";")
+                            .append(textField2.getText()).append("\n");
+                }
+            } else {
+                for (Object aStringSet : stringSet) {
+                    stringBuilderOutput.append(aStringSet).append(";").append(value_field_text).append("\n");
+                }
             }
             main_panel.insertString(main_panel.getLength(), stringSet.toString() + "\n", null);
             consoleLog(console.getLength(), "\nЗапись добавлена!", successKey);
@@ -368,7 +417,11 @@ public class MainGUI extends JDialog {
             try {
                 OutputStreamWriter osw = new OutputStreamWriter(
                         new FileOutputStream(fc.getSelectedFile() + ".csv"), "UTF-8");
-                osw.write("token;value\n");
+                if (getAdditionalState()) {
+                    osw.write("token;value;" + textField1.getText() + "\n");
+                } else {
+                    osw.write("token;value\n");
+                }
                 osw.write(String.valueOf(stringBuilderOutput));
                 osw.close();
                 consoleLog(console.getLength(), "\nФайл успешно сохранен по пути: ", successKey);
