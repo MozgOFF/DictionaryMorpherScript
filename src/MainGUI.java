@@ -11,35 +11,64 @@ import java.net.URL;
 import java.util.*;
 
 public class MainGUI extends JDialog {
-    private static final String TOKEN_1 = "ac5d61e2-fddb-44da-bf8d-2aceec0578af";   //мой
-    private static final String TOKEN_2 = "0914316b-fafb-4c86-a29b-791c639da5b2";   //мой второй
-    private static final String TOKEN_3 = "ba117244-42d8-4bcf-82f4-d8fb80a0e516";   //мой третий
-    private static final String TOKEN_4 = "f9dcf6ed-4455-449b-9e7d-e202d407eea4";   //мой четвертый
-    private static final String TOKEN_5 = "77701529-3a21-4603-9aec-d8c28d630dff";   //мой пятый
-    private static final String TOKEN_6 = "a7dab5fe-7a47-4c17-84ea-46facb7d19fe";   //неверный
-    private static final String TOKEN_7 = "4d753a2e-ad40-473f-a254-3107f83abcd7";   //неверный
-    private static final String TOKEN_8 = "179d415c-7116-4e54-91e8-6731fcf781de";   //неверный
+    private static final String[] TOKEN = {
+            "ac5d61e2-fddb-44da-bf8d-2aceec0578af",
+            "0914316b-fafb-4c86-a29b-791c639da5b2",
+            "ba117244-42d8-4bcf-82f4-d8fb80a0e516",
+            "f9dcf6ed-4455-449b-9e7d-e202d407eea4",
+            "77701529-3a21-4603-9aec-d8c28d630dff",
+            "4d753a2e-ad40-473f-a254-3107f83abcd7",
+            "179d415c-7116-4e54-91e8-6731fcf781de",
+            "a7dab5fe-7a47-4c17-84ea-46facb7d19fe",
+    };
+    private static final String[] LANG = {
+            "russian",
+            "qazaq",
+            "ukrainian"
+    };
+    private static final String[] THEME = {
+            "com.sun.java.swing.plaf.windows.WindowsLookAndFeel",
+            "javax.swing.plaf.nimbus.NimbusLookAndFeel",
+            "com.sun.java.swing.plaf.motif.MotifLookAndFeel",
+    };
+    private static final String[] SEPARATOR = {
+            ";",
+            ":",
+            ".",
+            ",",
+            " ",
+            "   ",
+            "\n",
+            "",
+    };
+    private static final String[] EXTENTION = {
+            ".csv",
+            ".txt",
+            ".cfg",
+    };
     private static final String BASE_URL = "https://ws3.morpher.ru/";
-    private static final String LANG_RU = "russian";   //борщ
-    private static final String LANG_KK = "qazaq";   //кумыс
-    private static final String LANG_UK = "ukrainian";   //сало
     private JPanel contentPane;
     private JButton buttonOK;
     private JButton buttonExport;
     private JButton addToDictionaryButton;
     private JTextPane textPane1;
     private JTextField textField_token;
-    private JTextField token_static_text;
     private JTextPane textPane2;
     private JComboBox comboBox1;
     private JButton remainderButton;
     private JTextField textField_value;
     private JButton clearValuesButton;
-    private JTextField value_static_text;
     private JTextField textField1;
     private JTextField textField2;
     private JComboBox comboBox2;
     private JCheckBox additionalFieldCheckBox;
+    private JTabbedPane tabbedPane1;
+    private JTextField token_static_text;
+    private JTextField value_static_text;
+    private JProgressBar progressBar1;
+    private JComboBox separatorComboBox;
+    private JComboBox themeComboBox;
+    private JComboBox extensionComboBox;
     private StyledDocument console;
     private StyledDocument main_panel;
     private StringBuilder stringBuilderOutput = new StringBuilder();
@@ -53,6 +82,10 @@ public class MainGUI extends JDialog {
     private String value_field_text;
     private String text_to_produce;
     private String used_token;
+    private static Separator separator = new Separator(";");
+    private static Extention extention = new Extention(".csv");
+    private static Theme theme = new Theme("UIManager.getSystemLookAndFeelClassName()");
+
 
 
     private MainGUI() {
@@ -60,47 +93,7 @@ public class MainGUI extends JDialog {
         setModal(true);
         getRootPane().setDefaultButton(addToDictionaryButton);
 
-        textField1.setBackground(Color.lightGray);
-        textField2.setBackground(Color.lightGray);
-
-        comboBox1.addItem(TOKEN_1);
-        comboBox1.addItem(TOKEN_2);
-        comboBox1.addItem(TOKEN_3);
-        comboBox1.addItem(TOKEN_4);
-        comboBox1.addItem(TOKEN_5);
-        comboBox1.addItem(TOKEN_6);
-        comboBox1.addItem(TOKEN_7);
-        comboBox1.addItem(TOKEN_8);
-
-        comboBox2.addItem(LANG_RU);
-        comboBox2.addItem(LANG_KK);
-        comboBox2.addItem(LANG_UK);
-
-        console = textPane2.getStyledDocument();
-        main_panel = textPane1.getStyledDocument();
-
-        errorKey = new SimpleAttributeSet();
-        StyleConstants.setForeground(errorKey, Color.RED);
-        StyleConstants.setBold(errorKey, false);
-
-        successKey = new SimpleAttributeSet();
-        StyleConstants.setForeground(successKey, Color.GREEN);
-        StyleConstants.setBold(successKey, false);
-
-        warningKey = new SimpleAttributeSet();
-        StyleConstants.setForeground(warningKey, Color.YELLOW);
-        StyleConstants.setBold(warningKey, false);
-
-
-        regularBold = new SimpleAttributeSet();
-        StyleConstants.setForeground(regularBold, Color.WHITE);
-        StyleConstants.setBold(regularBold, true);
-
-        SimpleAttributeSet keyWord = new SimpleAttributeSet();
-        StyleConstants.setBold(keyWord, true);
-
-
-        consoleLog(0, "Вас приветствует консоль: ", keyWord);
+        initUI();
 
 
         buttonOK.addActionListener(new ActionListener() {
@@ -178,6 +171,171 @@ public class MainGUI extends JDialog {
                 getAdditionalState();
             }
         });
+        separatorComboBox.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                System.out.println(separatorComboBox.getSelectedItem().toString());
+                switch (separatorComboBox.getSelectedIndex()) {
+                    case 0: separator.setSeparator(SEPARATOR[0]);
+                        consoleLog(console.getLength(), "\nИзменил разделитель на: 'Точка с запятой'", null);
+                        break;
+                    case 1: separator.setSeparator(SEPARATOR[1]);
+                        consoleLog(console.getLength(), "\nИзменил разделитель на: 'Двоеточие'", null);
+                        break;
+                    case 2: separator.setSeparator(SEPARATOR[2]);
+                        consoleLog(console.getLength(), "\nИзменил разделитель на: 'Точка'", null);
+                        break;
+                    case 3: separator.setSeparator(SEPARATOR[3]);
+                        consoleLog(console.getLength(), "\nИзменил разделитель на: 'Запятая'", null);
+                        break;
+                    case 4: separator.setSeparator(SEPARATOR[4]);
+                        consoleLog(console.getLength(), "\nИзменил разделитель на: 'Пробел'", null);
+                        break;
+                    case 5: separator.setSeparator(SEPARATOR[5]);
+                        consoleLog(console.getLength(), "\nИзменил разделитель на: 'Табуляция'", null);
+                        break;
+                    case 6: separator.setSeparator(SEPARATOR[6]);
+                        consoleLog(console.getLength(), "\nИзменил разделитель на: 'Новая линия'", null);
+                        break;
+                    case 7: separator.setSeparator(SEPARATOR[7]);
+                        consoleLog(console.getLength(), "\nИзменил разделитель на: 'Без разделителя'", null);
+                        break;
+                }
+            }
+        });
+        themeComboBox.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                switch (themeComboBox.getSelectedIndex()) {
+                    case 0:
+                        theme.setTheme(THEME[0]);
+                        try {
+                            UIManager.setLookAndFeel(theme.getTheme());
+                            new MainGUI();
+                        } catch (ClassNotFoundException e1) {
+                            consoleLog(console.getLength(), "\nУпс, тема упала: " + e1.getMessage(), errorKey);
+                            e1.printStackTrace();
+                        } catch (InstantiationException e1) {
+                            consoleLog(console.getLength(), "\nУпс, тема упала: " + e1.getMessage(), errorKey);
+                            e1.printStackTrace();
+                        } catch (IllegalAccessException e1) {
+                            consoleLog(console.getLength(), "\nУпс, тема упала: " + e1.getMessage(), errorKey);
+                            e1.printStackTrace();
+                        } catch (UnsupportedLookAndFeelException e1) {
+                            consoleLog(console.getLength(), "\nУпс, тема упала: " + e1.getMessage(), errorKey);
+                            e1.printStackTrace();
+                        }
+                        break;
+                    case 1:
+                        theme.setTheme(THEME[1]);
+                        try {
+                            UIManager.setLookAndFeel(theme.getTheme());
+                            new MainGUI();
+                        } catch (ClassNotFoundException e1) {
+                            consoleLog(console.getLength(), "\nУпс, тема упала: " + e1.getMessage(), errorKey);
+                            e1.printStackTrace();
+                        } catch (InstantiationException e1) {
+                            consoleLog(console.getLength(), "\nУпс, тема упала: " + e1.getMessage(), errorKey);
+                            e1.printStackTrace();
+                        } catch (IllegalAccessException e1) {
+                            consoleLog(console.getLength(), "\nУпс, тема упала: " + e1.getMessage(), errorKey);
+                            e1.printStackTrace();
+                        } catch (UnsupportedLookAndFeelException e1) {
+                            consoleLog(console.getLength(), "\nУпс, тема упала: " + e1.getMessage(), errorKey);
+                            e1.printStackTrace();
+                        }
+                        break;
+                    case 2:
+                        theme.setTheme(THEME[2]);
+                        try {
+                            UIManager.setLookAndFeel(theme.getTheme());
+                            new MainGUI();
+                        } catch (ClassNotFoundException e1) {
+                            consoleLog(console.getLength(), "\nУпс, тема упала: " + e1.getMessage(), errorKey);
+                            e1.printStackTrace();
+                        } catch (InstantiationException e1) {
+                            consoleLog(console.getLength(), "\nУпс, тема упала: " + e1.getMessage(), errorKey);
+                            e1.printStackTrace();
+                        } catch (IllegalAccessException e1) {
+                            consoleLog(console.getLength(), "\nУпс, тема упала: " + e1.getMessage(), errorKey);
+                            e1.printStackTrace();
+                        } catch (UnsupportedLookAndFeelException e1) {
+                            consoleLog(console.getLength(), "\nУпс, тема упала: " + e1.getMessage(), errorKey);
+                            e1.printStackTrace();
+                        }
+                        break;
+                }
+            }
+        });
+        extensionComboBox.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                switch (extensionComboBox.getSelectedIndex()) {
+                    case 0:
+                        extention.setExtention(EXTENTION[0]);
+                        break;
+                    case 1:
+                        extention.setExtention(EXTENTION[1]);
+                        break;
+                    case 2:
+                        extention.setExtention(EXTENTION[2]);
+                        break;
+                }
+            }
+        });
+    }
+
+    private void initUI() {
+        textField1.setBackground(Color.lightGray);
+        textField2.setBackground(Color.lightGray);
+
+        for (int i = 1; i <= TOKEN.length; i++) {
+            comboBox1.addItem(new ComboBoxItem("Token: " + i, TOKEN[i-1]));
+        }
+        for (String th : THEME) {
+            themeComboBox.addItem(th);
+        }
+        for (String lang: LANG) {
+            comboBox2.addItem(lang);
+        }
+
+        for (String ex : EXTENTION) {
+            extensionComboBox.addItem(ex);
+        }
+        separatorComboBox.addItem(new ComboBoxItem("Точка с запятой", ";"));
+        separatorComboBox.addItem(new ComboBoxItem("Двоеточие", ":"));
+        separatorComboBox.addItem(new ComboBoxItem("Точка", "."));
+        separatorComboBox.addItem(new ComboBoxItem("Запятая", ","));
+        separatorComboBox.addItem(new ComboBoxItem("Пробел", " "));
+        separatorComboBox.addItem(new ComboBoxItem("Табуляция", "    "));
+        separatorComboBox.addItem(new ComboBoxItem("Новая линия", "\n"));
+        separatorComboBox.addItem(new ComboBoxItem("Без разделителя", ""));
+
+
+        console = textPane2.getStyledDocument();
+        main_panel = textPane1.getStyledDocument();
+
+        errorKey = new SimpleAttributeSet();
+        StyleConstants.setForeground(errorKey, Color.RED);
+        StyleConstants.setBold(errorKey, false);
+
+        successKey = new SimpleAttributeSet();
+        StyleConstants.setForeground(successKey, Color.GREEN);
+        StyleConstants.setBold(successKey, false);
+
+        warningKey = new SimpleAttributeSet();
+        StyleConstants.setForeground(warningKey, Color.YELLOW);
+        StyleConstants.setBold(warningKey, false);
+
+
+        regularBold = new SimpleAttributeSet();
+        StyleConstants.setForeground(regularBold, Color.WHITE);
+        StyleConstants.setBold(regularBold, true);
+
+        SimpleAttributeSet keyWord = new SimpleAttributeSet();
+        StyleConstants.setBold(keyWord, true);
+
+        consoleLog(0, "Вас приветствует консоль: ", keyWord);
     }
 
     private boolean getAdditionalState() {
@@ -205,7 +363,6 @@ public class MainGUI extends JDialog {
         value_field_text = textField_value.getText();
         text_to_produce = textField_token.getText().toLowerCase();
 
-
         if (stringSet != null) {
             stringSet.clear();
         }
@@ -217,12 +374,12 @@ public class MainGUI extends JDialog {
             stringSet = new TreeSet<>(JSONOutputArray);
             if (getAdditionalState()) {
                 for (Object aStringSet : stringSet) {
-                    stringBuilderOutput.append(aStringSet).append(";").append(value_field_text).append(";")
+                    stringBuilderOutput.append(aStringSet).append(separator.getSeparator()).append(value_field_text).append(separator.getSeparator())
                             .append(textField2.getText()).append("\n");
                 }
             } else {
                 for (Object aStringSet : stringSet) {
-                    stringBuilderOutput.append(aStringSet).append(";").append(value_field_text).append("\n");
+                    stringBuilderOutput.append(aStringSet).append(separator.getSeparator()).append(value_field_text).append("\n");
                 }
             }
             main_panel.insertString(main_panel.getLength(), stringSet.toString() + "\n", null);
@@ -241,9 +398,14 @@ public class MainGUI extends JDialog {
         textField_value.setText(null);
     }
 
-    private String getUserToken() {
-        return (comboBox1.getSelectedIndex() == 0) ? TOKEN_1 :
-               (comboBox1.getSelectedIndex() == 1) ? TOKEN_2 : TOKEN_3;
+    private String getUserToken() { //ПЕРЕПИСАТЬ ЧЕРЕЗ КЛАССЫ!
+        return (comboBox1.getSelectedIndex() == 0) ? TOKEN[0] :
+                (comboBox1.getSelectedIndex() == 1) ? TOKEN[1] :
+                (comboBox1.getSelectedIndex() == 2) ? TOKEN[2] :
+                (comboBox1.getSelectedIndex() == 3) ? TOKEN[3] :
+                (comboBox1.getSelectedIndex() == 4) ? TOKEN[4] :
+                (comboBox1.getSelectedIndex() == 5) ? TOKEN[5] :
+                (comboBox1.getSelectedIndex() == 6) ? TOKEN[6] : TOKEN[7];
     }
 
     private void parseJSON(String json) {
@@ -405,9 +567,9 @@ public class MainGUI extends JDialog {
         }
     }
 
-    private String getLanguage() {
-        return (comboBox2.getSelectedIndex() == 0) ? LANG_RU :
-                (comboBox2.getSelectedIndex() == 1) ? LANG_KK: LANG_UK;
+    private String getLanguage() { //ПЕРЕПИСАТЬ ЧЕРЕЗ КЛАССЫ!
+        return (comboBox2.getSelectedIndex() == 0) ? LANG[0] :
+                (comboBox2.getSelectedIndex() == 1) ? LANG[1]: LANG[2];
     }
 
     private void exportCSV() {
@@ -416,11 +578,11 @@ public class MainGUI extends JDialog {
         if (fc.showSaveDialog(null) == JFileChooser.APPROVE_OPTION) {
             try {
                 OutputStreamWriter osw = new OutputStreamWriter(
-                        new FileOutputStream(fc.getSelectedFile() + ".csv"), "UTF-8");
+                        new FileOutputStream(fc.getSelectedFile() + extention.getExtention()), "UTF-8");
                 if (getAdditionalState()) {
-                    osw.write("token;value;" + textField1.getText() + "\n");
+                    osw.write("token" + separator.getSeparator() + "value" + separator.getSeparator() + textField1.getText() + "\n");
                 } else {
-                    osw.write("token;value\n");
+                    osw.write("token" + separator.getSeparator() + "value\n");
                 }
                 osw.write(String.valueOf(stringBuilderOutput));
                 osw.close();
@@ -449,7 +611,7 @@ public class MainGUI extends JDialog {
         }
     }
 
-    private void consoleLog(int offset, String str, AttributeSet a) {
+    private void consoleLog(int offset, String str, AttributeSet a) { //ПЕРЕПИСАТЬ ЧЕРЕЗ КЛАССЫ!
         try {
             console.insertString(offset, str, a);
         } catch (BadLocationException e) {
